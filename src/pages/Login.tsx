@@ -24,7 +24,7 @@ function Login() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<LoginData>({
     resolver
   });
 

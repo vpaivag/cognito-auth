@@ -23,7 +23,7 @@ export const CognitoContext = createContext<CognitoContextType>({
   signOut
 });
 
-function CognitoProvider({ children }) {
+function CognitoProvider({ children }: { children: React.ReactNode }) {
   const isAuthenticated = useStore<boolean>(isAuthenticatedStore);
   const [user, setUser] = useState<CognitoContextType["user"] | null>({
     username: "",

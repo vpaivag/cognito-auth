@@ -17,7 +17,7 @@ const schema = z.object({
 
 const resolver = zodResolver(schema);
 
-type LoginData = z.infer<typeof schema>;
+type SignupData = z.infer<typeof schema>;
 
 function Signup() {
   const navigate = useNavigate();
@@ -26,11 +26,11 @@ function Signup() {
     register,
     handleSubmit,
     formState: { errors },
-  } = useForm({
+  } = useForm<SignupData>({
     resolver
   });
 
-  const handleSigin: SubmitHandler<LoginData> = async ({
+  const handleSigin: SubmitHandler<SignupData> = async ({
     phoneNumber,
     email,
     name,
