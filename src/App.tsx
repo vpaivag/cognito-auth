@@ -1,4 +1,4 @@
-import { RouterProvider, createBrowserRouter, redirect } from 'react-router-dom'
+import { RouterProvider, createBrowserRouter } from 'react-router-dom'
 import './App.css'
 import { Login } from './pages/Login'
 import { Signup } from './pages/Signup'
@@ -7,9 +7,7 @@ import { config } from './lib/awsConfig'
 import { ConfirmAccount } from './pages/ConfirmAccount'
 import { CognitoProvider } from './contexts/CognitoProvider'
 import { Layout } from './pages/Layout'
-import { Protected } from './pages/Protected'
-import { isAuthenticatedStore } from './stores/auth'
-import { WithCognito } from './components/AuthRoute'
+import { Profile } from './pages/Profile'
 
 Amplify.configure(config)
 
@@ -21,13 +19,6 @@ const router = createBrowserRouter([
     children: [
       {
         path: '',
-        loader: () => {
-          console.log('isAuthenticatedStore.state', isAuthenticatedStore.state);
-          if (!isAuthenticatedStore.state) {
-            return null;
-          }
-          return null;
-        },
         element: <h1>Home</h1>,
       },
       {
@@ -36,13 +27,6 @@ const router = createBrowserRouter([
       },
       {
         path: 'signup',
-        loader: () => {
-          console.log('isAuthenticatedStore.state', isAuthenticatedStore.state);
-          if (!isAuthenticatedStore.state) {
-            return null;
-          }
-          return redirect('/');
-        },
         element: <Signup />,
       },
       {
@@ -50,14 +34,8 @@ const router = createBrowserRouter([
         element: <ConfirmAccount />,
       },
       {
-        path: 'protected',
-        // loader: () => {
-        //   if (!isAuthenticatedStore.state) {
-        //     return redirect('/login')
-        //   }
-        //   return null;
-        // },
-        element: <WithCognito><Protected /></WithCognito>,
+        path: 'profile',
+        element: <Profile />,
         }
     ],
   },

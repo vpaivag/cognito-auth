@@ -87,7 +87,7 @@ function Signup() {
           {errors.phoneNumber && <p className="error">{errors.phoneNumber.message as string}</p>}
         </div>
         <div className="input">
-          <label>Email</label>
+          <label>Email <span>(optional)</span></label>
           <input {...register("email")} />
           {errors.email && <p className="error">{errors.email.message as string}</p>}
         </div>

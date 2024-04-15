@@ -11,7 +11,7 @@ function Layout() {
       <h1>Cognito App</h1>
       <div>
         <Link className="link" to="/">Home</Link>
-        <Link className="link" to="/protected">Protected</Link>
+        <Link className="link" to="/profile">Profile</Link>
         {isAuthenticated ? (
           <button onClick={signOut} className="signout-btn">Sign Out</button>
         ) : (

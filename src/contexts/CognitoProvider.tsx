@@ -1,8 +1,6 @@
 import { createContext, useEffect, useState } from "react"
 import { signOut, getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
-import { useStore } from "@tanstack/react-store";
-import { isAuthenticatedStore } from "../stores/auth";
 
 type CognitoContextType = {
   isAuthenticated: boolean;
@@ -24,7 +22,7 @@ export const CognitoContext = createContext<CognitoContextType>({
 });
 
 function CognitoProvider({ children }: { children: React.ReactNode }) {
-  const isAuthenticated = useStore<boolean>(isAuthenticatedStore);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
   const [user, setUser] = useState<CognitoContextType["user"] | null>({
     username: "",
     userId: "",
@@ -35,15 +33,14 @@ function CognitoProvider({ children }: { children: React.ReactNode }) {
       try {
         const user = await getCurrentUser();
         const userAttributes = await fetchUserAttributes();
-        isAuthenticatedStore.setState(() => true);
-
+        setIsAuthenticated(true);
         setUser({
           username: user.username,
           userId: user.userId,
           name: userAttributes.name
         });
       } catch (error) {
-        isAuthenticatedStore.setState(() => false);
+        setIsAuthenticated(false);
         setUser(null);
       }
     }
@@ -52,14 +49,20 @@ function CognitoProvider({ children }: { children: React.ReactNode }) {
   }, []);
 
   useEffect(() => {
-    const subscriber = Hub.listen("auth", ({ payload: { event, data } }) => {
+    const subscriber = Hub.listen("auth", async ({ payload: { event, data } }) => {
       switch (event) {
         case "signedIn":
-          isAuthenticatedStore.setState(() => true);
-          setUser(data);
+          setIsAuthenticated(true);
+          // eslint-disable-next-line no-case-declarations
+          const userAttributes = await fetchUserAttributes();
+          setUser({
+            username: data.username,
+            userId: data.userId,
+            name: userAttributes.name
+          });
           break;
         case "signedOut":
-          isAuthenticatedStore.setState(() => false);
+          setIsAuthenticated(false);
           setUser(null);
           break;
       }
