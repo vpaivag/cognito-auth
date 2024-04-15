@@ -1,18 +1,9 @@
-import { useNavigate } from "react-router-dom";
 import { useCognito } from "../hooks/useCognito";
-import { useEffect } from "react";
 import { withCognito } from "../utils/withCognito";
 
 function Profile() {
-  const { user, isAuthenticated } = useCognito();
-  const navigate = useNavigate(); 
-
-  useEffect(() => {
-    if (!isAuthenticated) {
-      navigate('/login');
-    }
-  });
-
+  const { user } = useCognito();
+  
   return (
     <div>
       <h1>Profile</h1>

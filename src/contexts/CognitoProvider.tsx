@@ -23,21 +23,19 @@ export const CognitoContext = createContext<CognitoContextType>({
 
 function CognitoProvider({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<CognitoContextType["user"] | null>({
-    username: "",
-    userId: "",
-  });
+  const [user, setUser] = useState<CognitoContextType["user"] | null>(null);
 
+  // Permite que el usuario se mantenga autenticado al recargar la página
   useEffect(() => {
     const fetchSession = async () => {
       try {
-        const user = await getCurrentUser();
-        const userAttributes = await fetchUserAttributes();
+        const user = await getCurrentUser(); // Throw an error if the user is not authenticated
+        const userAttributes = await fetchUserAttributes(); // Fetch the user attributes
         setIsAuthenticated(true);
         setUser({
           username: user.username,
           userId: user.userId,
-          name: userAttributes.name
+          name: userAttributes.name,
         });
       } catch (error) {
         setIsAuthenticated(false);
@@ -48,6 +46,7 @@ function CognitoProvider({ children }: { children: React.ReactNode }) {
     fetchSession();
   }, []);
 
+  // Escucha los eventos de autenticación
   useEffect(() => {
     const subscriber = Hub.listen("auth", async ({ payload: { event, data } }) => {
       switch (event) {

@@ -2,14 +2,13 @@ import { confirmSignUp } from "aws-amplify/auth";
 import { useState } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
 
-
 function ConfirmAccount() {
   const [code, setCode] = useState<string>("");
   const navigate = useNavigate();
 
   const {state} = useLocation();
   console.log('state', state);
-  const username = state?.phoneNumber;
+  const username = state?.phoneNumber || state?.email;
 
   if (!username) {
     navigate("/signup");

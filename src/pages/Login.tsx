@@ -6,10 +6,7 @@ import { useNavigate } from "react-router-dom";
 import { z } from "zod";
 
 const schema = z.object({
-  // E.164 phone number regex
-  phoneNumber: z.string().regex(/^\+[1-9]\d{1,14}$/, {
-    message: "Invalid phone number",
-  }),
+  email: z.string().email(),
   password: z.string().min(8),
 });
 
@@ -22,26 +19,26 @@ function Login() {
   const navigate = useNavigate();
   const {
     register,
-    handleSubmit,
+    handleSubmit, // Funcion que valida inputs antes de realizar logica
     formState: { errors },
   } = useForm<LoginData>({
     resolver
   });
 
   const handleSigin: SubmitHandler<LoginData> = async ({
-    phoneNumber,
+    email,
     password
   }) => {
-    console.log("phoneNumber: " + phoneNumber);
     setError(null);
     try {
       await signIn({
-        username: phoneNumber,
+        username: email,
         password: password,
         options: {
           authFlowType: "USER_PASSWORD_AUTH",
         }
       });
+      // Navigate to the home page after successful login
       navigate("/", {
         replace: true
       });
@@ -60,9 +57,9 @@ function Login() {
       <form className="form" onSubmit={handleSubmit(handleSigin)}>
         {error && <p className="error">{error}</p>}
         <div className="input">
-          <label>Phone Number</label>
-          <input type="tel" {...register("phoneNumber")} />
-          {errors.phoneNumber && <p className="error">{errors.phoneNumber.message as string}</p>}
+          <label>Email</label>
+          <input {...register("email")} />
+          {errors.email && <p className="error">{errors.email.message as string}</p>}
         </div>
         <div className="input">
           <label>Password</label>

@@ -6,18 +6,19 @@ import { SubmitHandler, useForm } from "react-hook-form";
 import { z } from "zod";
 
 const schema = z.object({
-  // E.164 phone number regex
-  phoneNumber: z.string().regex(/^\+[1-9]\d{1,14}$/, {
-    message: "Invalid phone number",
-  }),
-  email: z.string().email().optional(),
+  email: z.string().email(),
   name: z.string().min(2),
   password: z.string().min(8),
-});
+})
 
 const resolver = zodResolver(schema);
 
-type SignupData = z.infer<typeof schema>;
+type SignupData = {
+  email: string;
+  phoneNumber?: string;
+  name: string;
+  password: string;
+};
 
 function Signup() {
   const navigate = useNavigate();
@@ -31,7 +32,6 @@ function Signup() {
   });
 
   const handleSigin: SubmitHandler<SignupData> = async ({
-    phoneNumber,
     email,
     name,
     password
@@ -39,7 +39,7 @@ function Signup() {
     setError(null);
     try {
       const { nextStep } = await signUp({
-        username: phoneNumber,
+        username: email as string,
         password,
         options: {
           userAttributes: {
@@ -53,11 +53,13 @@ function Signup() {
       case "CONFIRM_SIGN_UP":
         navigate("/confirm-signup", {
           state: {
-            phoneNumber
+            email
           }
         });
         break;
       default:
+        // Navigate to the login page after successful signup
+        // Auto sign in is disabled by default
         navigate("/login");
         break;
     }
@@ -77,19 +79,14 @@ function Signup() {
       <form className="form" onSubmit={handleSubmit(handleSigin)}>
         {error && <p className="error">{error}</p>}
         <div className="input">
+          <label>Email</label>
+          <input {...register("email")} />
+          {errors.email && <p className="error">{errors.email.message as string}</p>}
+        </div>
+        <div className="input">
           <label>Name</label>
           <input {...register("name")} />
           {errors.name && <p className="error">{errors.name.message as string}</p>}
-        </div>
-        <div className="input">
-          <label>Phone Number</label>
-          <input type="tel" {...register("phoneNumber")} />
-          {errors.phoneNumber && <p className="error">{errors.phoneNumber.message as string}</p>}
-        </div>
-        <div className="input">
-          <label>Email <span>(optional)</span></label>
-          <input {...register("email")} />
-          {errors.email && <p className="error">{errors.email.message as string}</p>}
         </div>
         <div className="input">
           <label>Password</label>
