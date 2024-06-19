@@ -73,6 +73,18 @@
   border: 0px;
 }
 
+
+.fake-input {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.5em;
+  border-radius: 8px;
+  border: 0px;
+ }
+
 .error {
   color: red;
   margin: 0;

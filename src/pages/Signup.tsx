@@ -8,17 +8,14 @@ import { z } from "zod";
 const schema = z.object({
   email: z.string().email(),
   name: z.string().min(2),
+  phoneNumber: z.string().regex(/^\d{8}$/),
+  type: z.enum(["transportista", "generador", "conductor", "operador"]),
   password: z.string().min(8),
 })
 
 const resolver = zodResolver(schema);
 
-type SignupData = {
-  email: string;
-  phoneNumber?: string;
-  name: string;
-  password: string;
-};
+type SignupData = z.infer<typeof schema>;
 
 function Signup() {
   const navigate = useNavigate();
@@ -34,7 +31,7 @@ function Signup() {
   const handleSigin: SubmitHandler<SignupData> = async ({
     email,
     name,
-    password
+    password, phoneNumber, type
   }) => {
     setError(null);
     try {
@@ -44,7 +41,9 @@ function Signup() {
         options: {
           userAttributes: {
             email,
-            name
+            name,
+            phone_number: "+569" + phoneNumber,
+            "custom:role": type
           }
         }
       })
@@ -89,9 +88,27 @@ function Signup() {
           {errors.name && <p className="error">{errors.name.message as string}</p>}
         </div>
         <div className="input">
+          <label>Telefono</label>
+          <div className="fake-input">
+            <span>+569</span>
+            <input {...register("phoneNumber")} />
+          </div>
+          {errors.phoneNumber && <p className="error">{errors.phoneNumber.message as string}</p>}
+        </div>
+        <div className="input">
           <label>Password</label>
-          <input {...register("password")} type="password" />
+          <input {...register("password")} type="password"/>
           {errors.password && <p className="error">{errors.password.message as string}</p>}
+        </div>
+        <div className="input">
+          <label>Rol</label>
+          <select {...register("type")}>
+            <option value="transportista">Transportista</option>
+            <option value="generador">Generador</option>
+            <option value="conductor">Conductor</option>
+            <option value="operador">Operador</option>
+          </select >
+          {errors.type && <p className="error">{errors.type.message as string}</p>}
         </div>
         <button type="submit">Signup</button>
       </form>
@@ -99,4 +116,4 @@ function Signup() {
   );
 }
 
-export { Signup }
+export {Signup}

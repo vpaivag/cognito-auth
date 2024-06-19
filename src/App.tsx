@@ -5,7 +5,7 @@ import { Signup } from './pages/Signup'
 import { Amplify } from 'aws-amplify'
 import { config } from './lib/awsConfig'
 import { ConfirmAccount } from './pages/ConfirmAccount'
-import { CognitoProvider } from './contexts/CognitoProvider'
+import { useCognito } from './contexts/CognitoProvider'
 import { Layout } from './pages/Layout'
 import { Profile } from './pages/Profile'
 
@@ -42,10 +42,9 @@ const router = createBrowserRouter([
 ])
 
 function App() {
+  useCognito() // initialize the Cognito auth
   return (
-    <CognitoProvider>
       <RouterProvider router={router} />
-    </CognitoProvider>
   )
 }
 

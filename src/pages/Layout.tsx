@@ -1,9 +1,9 @@
 import { Link, Outlet } from "react-router-dom";
-import { useCognito } from "../hooks/useCognito";
+import { useAuth } from "../hooks/useAuth";
 
 function Layout() {
 
-  const { isAuthenticated, signOut, user } = useCognito(); // Import the useCognito hook
+  const { isAuthenticated, signOut, user } = useAuth(); // Import the useCognito hook
 
   return (
     <>
@@ -14,7 +14,7 @@ function Layout() {
         <Link className="link" to="/">Home</Link>
         <Link className="link" to="/profile">Profile</Link>
         {isAuthenticated ? (
-          <button onClick={signOut} className="signout-btn">Sign Out</button>
+          <button onClick={() => signOut()} className="signout-btn">Sign Out</button>
         ) : (
           <>
           <Link className="link" to="/login">Login</Link>

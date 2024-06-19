@@ -1,29 +1,13 @@
-import { createContext, useEffect, useState } from "react"
-import { signOut, getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
+import { useEffect } from "react"
+import { getCurrentUser, fetchUserAttributes } from "aws-amplify/auth";
 import { Hub } from "aws-amplify/utils";
+import { useAtom } from "jotai";
 
-type CognitoContextType = {
-  isAuthenticated: boolean;
-  user: {
-    username: string;
-    userId: string;
-    name?: string;
-  } | null;
-  signOut: () => void;
-}
+import { isAuthenticatedAtom, userAtom } from "../atoms/session";
 
-export const CognitoContext = createContext<CognitoContextType>({
-  isAuthenticated: false,
-  user: {
-    username: "",
-    userId: "",
-  },
-  signOut
-});
-
-function CognitoProvider({ children }: { children: React.ReactNode }) {
-  const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
-  const [user, setUser] = useState<CognitoContextType["user"] | null>(null);
+function useCognito() {
+  const [, setIsAuthenticated] = useAtom(isAuthenticatedAtom);
+  const [, setUser] = useAtom(userAtom);
 
   // Permite que el usuario se mantenga autenticado al recargar la página
   useEffect(() => {
@@ -31,6 +15,7 @@ function CognitoProvider({ children }: { children: React.ReactNode }) {
       try {
         const user = await getCurrentUser(); // Throw an error if the user is not authenticated
         const userAttributes = await fetchUserAttributes(); // Fetch the user attributes
+
         setIsAuthenticated(true);
         setUser({
           username: user.username,
@@ -38,16 +23,18 @@ function CognitoProvider({ children }: { children: React.ReactNode }) {
           name: userAttributes.name,
         });
       } catch (error) {
+        console.error('Error fetching user session', error);
         setIsAuthenticated(false);
         setUser(null);
       }
-    }
-
+    };
+    console.log('Fetching session');
     fetchSession();
   }, []);
 
   // Escucha los eventos de autenticación
   useEffect(() => {
+    // @ts-expect-error No se puede inferir el tipo de la función
     const subscriber = Hub.listen("auth", async ({ payload: { event, data } }) => {
       switch (event) {
         case "signedIn":
@@ -71,16 +58,6 @@ function CognitoProvider({ children }: { children: React.ReactNode }) {
       subscriber();
     }
   });
-
-  return (
-    <CognitoContext.Provider value={{
-      isAuthenticated,
-      user,
-      signOut
-    }}>
-      {children}
-    </CognitoContext.Provider>
-  );
 }
 
-export { CognitoProvider };
+export { useCognito };

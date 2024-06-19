@@ -1,8 +1,8 @@
-import { useCognito } from "../hooks/useCognito";
+import { useAuth } from "../hooks/useAuth";
 import { withCognito } from "../utils/withCognito";
 
 function Profile() {
-  const { user } = useCognito();
+  const { user } = useAuth();
   
   return (
     <div>
